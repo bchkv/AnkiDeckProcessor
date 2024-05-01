@@ -40,11 +40,26 @@ def fetch_with_merriam_webster(word):
 
 
 def fetch_with_gTTS(word):
-    tts = gTTS(text=word, lang='en')  # Create a gTTS object
-    tts.save(f"{MEDIA_DIRECTORY_PATH}/{word}.mp3")  # Save the audio to a file
-    print(f"{word}.mp3 generated with gTTS and saved successfully!")
+    try:
+        tts = gTTS(text=word, lang='en')  # Create a gTTS object
+        tts.save(f"{MEDIA_DIRECTORY_PATH}/{word}.mp3")  # Save the audio to a file
+        print(f"{word}.mp3 generated with gTTS and saved successfully!")
+        return True
+    except Exception as e:
+        # General exception catch, which might include file I/O errors, etc.
+        print(f"An unexpected error occurred while generating audio for '{word}' with gTTS: {e}")
+        return False
 
 
 def get_pronunciation(word):
-    if not fetch_with_merriam_webster(word):
-        fetch_with_gTTS(word)
+    # First, try to fetch the pronunciation with Merriam-Webster
+    if fetch_with_merriam_webster(word):
+        return True  # Returns True if successful
+    else:
+        # If Merriam-Webster fails, try with gTTS
+        if fetch_with_gTTS(word):
+            return True  # Returns True if gTTS is successful
+        else:
+            return False  # Returns False if both methods fail
+
+    return False  # Explicitly state the default return value
