@@ -34,13 +34,14 @@ def fetch_with_merriam_webster(word):
             return True
 
         except (HTTPError, IndexError, KeyError, AttributeError) as e:
-            print(f"Failed to fetch from Merriam-Webster due to: {e}. Falling back to gTTS.")
+            print(f"Failed to fetch from Merriam-Webster due to: {e}.")
             fetch_with_gTTS(word)  # Fallback to gTTS
             return False
 
 
 def fetch_with_gTTS(word):
     try:
+        print(f"Trying to get {word}.mp3 with gTTS...")
         tts = gTTS(text=word, lang='en')  # Create a gTTS object
         tts.save(f"{MEDIA_DIRECTORY_PATH}/{word}.mp3")  # Save the audio to a file
         print(f"{word}.mp3 generated with gTTS and saved successfully!")

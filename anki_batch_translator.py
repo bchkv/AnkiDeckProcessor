@@ -1,32 +1,29 @@
 import sqlite3
-import os
 from download_utils import get_pronunciation
 
+# The path to the collection.anki2 file, originally it's
+# '/Users/bochkovoy/Library/Application Support/Anki2/Bochkovoy/collection.anki2'
+DB_PATH = '/Users/bochkovoy/Desktop/collection_test.anki2'
 
-# TODO: Change to extract the right column with words to voice
+
 def get_words_from_database(db_path):
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
-    query = "SELECT id, flds FROM notes"
+    query = "SELECT sfld FROM notes WHERE tags LIKE '%to_voice%'"
     cursor.execute(query)
-    notes = cursor.fetchall()
-
-    words = {note_id: flds.split(chr(31))[1] for note_id, flds in notes}
+    words = cursor.fetchall()
 
     conn.close()
-    return words
+    return words  # Here we return a list of words to process
 
 
-# TODO: Design something better for handling the database path
-# Replace with the path to your Anki database
-db_path = '/Users/bochkovoy/Downloads/1000 Basic English Words - Type Answer/collection.anki21'
-words_to_translate = get_words_from_database(db_path)
-
-print(words_to_translate)
+words_to_voice = get_words_from_database(DB_PATH)
+print(f"Selected words: {words_to_voice}")
+print(f"{len(words_to_voice)} words will be processed.")
 
 
-def update_database_with_translations(db_path, translations):
+def add_audio_to_database(db_path, translations):
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
@@ -44,17 +41,13 @@ def update_database_with_translations(db_path, translations):
     conn.close()
 
 
-# TODO: Use the get_pronunciation() instead of queries to GPT
-translations = {}
+# TODO: Use words_to_voice list
+# TODO: Each word from words_to_voice should be saved to collection.media
+# TODO: Each audio should be recorded into flds with the format [sound:{word}.mp3]
 number = 0
-for note_id, word in words_to_translate.items():
-    # Here you would get the translation from ChatGPT
-    # Example: translations[note_id] = get_translation_from_chatgpt(word)
-    # For demonstration, let's say the translation function is called `get_translation_from_chatgpt`
-    translations[note_id] = get_translation_from_chatgpt(word)
-    print(f"{number}: Translation for '{word}' — '{translations[note_id]}'")
+for note_id, word in words_to_voice.items():
+    audios[note_id] = get_pronunciation(word)
+    print(f"{number}: Translation for '{word}' — '{audios[note_id]}'")
     number = number + 1
 
-print(translations)
-
-update_database_with_translations(db_path, translations)
+add_audio_to_database(DB_PATH, audios)
