@@ -7,7 +7,8 @@ from requests import HTTPError
 
 
 # Path to the collection.media directory
-MEDIA_DIRECTORY_PATH = '/Users/bochkovoy/Library/Application Support/Anki2/Bochkovoy/collection.media'
+# The real directory: '/Users/bochkovoy/Library/Application Support/Anki2/Bochkovoy/collection.media'
+MEDIA_DIRECTORY_PATH = '/Users/bochkovoy/Downloads'
 
 
 def fetch_with_merriam_webster(word):
@@ -27,7 +28,7 @@ def fetch_with_merriam_webster(word):
             audio_file.raise_for_status()  # Check if the audio file was retrieved successfully
 
             # Saving the audio file
-            with open(f"/Users/bochkovoy/Temporary/{word}.mp3", 'wb') as file:
+            with open(f"{MEDIA_DIRECTORY_PATH}/{word}.mp3", 'wb') as file:
                 file.write(audio_file.content)
                 print(f"{word}.mp3 downloaded from Merriam-Webster and saved successfully!")
             return True
