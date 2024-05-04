@@ -30,7 +30,6 @@ def fetch_with_merriam_webster(word, download_path):
 
         except (HTTPError, IndexError, KeyError, AttributeError) as e:
             print(f"Failed to fetch from Merriam-Webster due to: {e}.")
-            fetch_with_gTTS(word, download_path)  # Fallback to gTTS
             return False
 
 

@@ -10,16 +10,21 @@ MEDIA_DIRECTORY_PATH = '/Users/bochkovoy/Library/Application Support/Anki2/Bochk
 
 
 def get_words_from_database(db_path):
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
+    # Manage the database connection with a context manager
+    with sqlite3.connect(db_path) as conn:
+        # Create the cursor object without a context manager
+        cursor = conn.cursor()
+        try:
+            query = "SELECT sfld FROM notes WHERE tags LIKE '%to_voice%'"
+            cursor.execute(query)
+            words = cursor.fetchall()
+            # Convert from list of tuples to a list of strings
+            words = [item[0] for item in words]
+        finally:
+            # Ensure the cursor is closed after use
+            cursor.close()
 
-    query = "SELECT sfld FROM notes WHERE tags LIKE '%to_voice%'"
-    cursor.execute(query)
-    words = cursor.fetchall()
-    words = [item[0] for item in words]  # convert from list of tuples to a list of strings
-
-    conn.close()
-    return words  # Here we return a list of words to process
+    return words  # Return the list of words to process
 
 
 words_to_voice = get_words_from_database(DB_PATH)
@@ -32,8 +37,9 @@ def add_audio_to_database(db_path, words):
     try:
         # Automatically manage the database connection
         with sqlite3.connect(db_path) as conn:
-            # Automatically manage the cursor
-            with conn.cursor() as cursor:
+            # Manually create and manage the cursor
+            cursor = conn.cursor()
+            try:
                 for word in words:
                     cursor.execute("SELECT flds FROM notes WHERE sfld = ?", (word,))
                     result = cursor.fetchone()
@@ -56,6 +62,9 @@ def add_audio_to_database(db_path, words):
 
                 conn.commit()
                 print("The database was modified successfully!")
+            finally:
+                # Ensure the cursor is closed after use
+                cursor.close()
 
     except sqlite3.DatabaseError as e:
         print(f"Database error occurred: {e}")
