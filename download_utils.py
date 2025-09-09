@@ -2,8 +2,20 @@ import json
 from gtts import gTTS
 import requests
 from bs4 import BeautifulSoup
-
+from openai import OpenAI
+from dotenv import load_dotenv
 from requests import HTTPError
+
+
+# Load environment variables from .env file
+load_dotenv()
+
+client = OpenAI()
+# defaults to getting the key using os.environ.get("OPENAI_API_KEY")
+# if you saved the key under a different environment variable name, you can do something like:
+# client = OpenAI(
+#   api_key=os.environ.get("CUSTOM_ENV_NAME"),
+# )
 
 
 def fetch_with_merriam_webster(word, download_path):
@@ -45,6 +57,10 @@ def fetch_with_gTTS(word, download_path):
         print(f"An unexpected error occurred while generating audio for '{word}' with gTTS: {e}")
         return False
 
+
+def fetch_with_GPT(word,download_path):
+    # TODO: implement fetching audio with OpenAI text-to-audio model
+    return
 
 def get_pronunciation(word, download_path):
     # First, try to fetch the pronunciation with Merriam-Webster

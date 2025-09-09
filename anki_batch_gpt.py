@@ -82,4 +82,3 @@ for note_id, word in words_to_translate.items():
 print(translations)
 
 update_database_with_translations(db_path, translations)
-
